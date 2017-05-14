@@ -1,0 +1,2 @@
+﻿  test_vec.cpp
+c:\users\tomoya\documents\github\simplevolpath_bssrdf\tests\test_vec.cpp(4): fatal error C1083: include ファイルを開けません。'gtest/gtest.h':No such file or directory

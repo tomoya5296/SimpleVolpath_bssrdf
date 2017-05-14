@@ -1,0 +1,2 @@
+﻿  test_vec.cpp
+LINK : fatal error LNK1561: エントリー ポイントを定義しなければなりません。

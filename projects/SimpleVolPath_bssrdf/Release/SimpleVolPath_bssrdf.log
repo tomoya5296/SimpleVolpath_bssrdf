@@ -1,0 +1,26 @@
+﻿  main.cpp
+c:\users\tomoya\documents\github\simplevolpath_bssrdf\src\bvh.h(22): warning C4305: '=': 'const double' から 'float' へ切り詰めます。
+c:\users\tomoya\documents\github\simplevolpath_bssrdf\src\bvh.h(23): warning C4305: '=': 'const double' から 'float' へ切り詰めます。
+c:\users\tomoya\documents\github\simplevolpath_bssrdf\src\bvh.h(84): warning C4244: '引数': 'const double' から 'const float' への変換です。データが失われる可能性があります。
+c:\users\tomoya\documents\github\simplevolpath_bssrdf\src\bvh.h(87): warning C4018: '<=': signed と unsigned の数値を比較しようとしました。
+..\..\src\main.cpp(49): warning C4018: '<': signed と unsigned の数値を比較しようとしました。
+..\..\src\main.cpp(246): warning C4244: 'return': 'double' から 'float' への変換です。データが失われる可能性があります。
+..\..\src\main.cpp(269): warning C4244: 'return': 'double' から 'float' への変換です。データが失われる可能性があります。
+..\..\src\main.cpp(568): warning C4067: プリプロセッサ ディレクティブの後に余分な文字がありました - 改行が必要です
+..\..\src\main.cpp(899): warning C4018: '<': signed と unsigned の数値を比較しようとしました。
+..\..\src\main.cpp(902): warning C4018: '<': signed と unsigned の数値を比較しようとしました。
+..\..\src\main.cpp(941): warning C4244: '=': 'const double' から 'float' への変換です。データが失われる可能性があります。
+..\..\src\main.cpp(942): warning C4244: '=': 'const double' から 'float' への変換です。データが失われる可能性があります。
+..\..\src\main.cpp(943): warning C4244: '=': 'const double' から 'float' への変換です。データが失われる可能性があります。
+..\..\src\main.cpp(944): warning C4244: '=': 'const double' から 'float' への変換です。データが失われる可能性があります。
+..\..\src\main.cpp(945): warning C4244: '=': 'const double' から 'float' への変換です。データが失われる可能性があります。
+..\..\src\main.cpp(946): warning C4244: '=': 'const double' から 'float' への変換です。データが失われる可能性があります。
+..\..\src\main.cpp(1001): warning C4018: '<': signed と unsigned の数値を比較しようとしました。
+..\..\src\main.cpp(1007): warning C4018: '<': signed と unsigned の数値を比較しようとしました。
+..\..\src\main.cpp(1008): warning C4018: '<': signed と unsigned の数値を比較しようとしました。
+  コード生成しています。
+  3 of 2306 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    27 functions had inline decision re-evaluated but remain unchanged
+  コード生成が終了しました。
+  SimpleVolPath_bssrdf.vcxproj -> C:\Users\tomoya\Documents\GitHub\SimpleVolPath_bssrdf\Release\SimpleVolPath_bssrdf.exe
