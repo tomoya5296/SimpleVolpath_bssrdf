@@ -1,3 +1,5 @@
+//aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+
 //#define bssrdf
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <cmath>
@@ -317,20 +319,23 @@ Color radiance(const Ray &ray, const Medium &medium, Random &rng, int depth, int
 	 double tr_select =0.0;
 	if (0.0 < scattering_probability) {
 		//平均自由工程
-		 double u = rng.next01();
+		
 		 double tr_use = tr_average;
-		if (u <= (1.0 / 3.0)) {
+		 
+		/* double u = rng.next01();
+		if (u <= double(1.0 / 3.0)) {
 			tr_use = sigT.x;
 		}
-		else if (u<=(2.0/3.0)) {
+		else if (u<=double(2.0/3.0)) {
 			 tr_use = sigT.y;
 		}
-		else {
+		else if(u<=1.0){
+
 			 tr_use = sigT.z;
-		}
-		// tr_use = sigT.z;
-		
-		 double d = -log(1.0 - u) / tr_use;
+		}*/
+		 tr_use = sigT.z;
+		double w = rng.next01();
+		 double d = -log(1.0 - w) / tr_use;
 
 		if (d >= t) {
 		d = t;
@@ -429,7 +434,6 @@ Color radiance(const Ray &ray, const Medium &medium, Random &rng, int depth, int
 			const double g = 0.0;
 			const double denom = std::sqrt(std::max(0.0, 1.0 + g * g - 2.0 * g * cosTheta));
 			const double phase = (1.0 - g * g) / (4.0 * PI * denom * denom * denom);
-			const Vec albed = Vec(medium.sigS / sigT);
 			if (pdf == 0.0) {
 				return Color(0.0);
 			}
@@ -1017,7 +1021,7 @@ int main(int argc, char **argv) {
 		// コマンド引数のパース
 		int width = 320;
 		int height = 240;
-		int samples = 200;//100;
+		int samples = 100;//100;
 		int maxDepth =100;//25;
 		for (int i = 1; i < argc; i++) {
 			if (strcmp(argv[i], "--width") == 0) {
