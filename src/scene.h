@@ -8,10 +8,10 @@
 
 
 // ”}Ž¿‚ÌƒŠƒXƒg
-Medium milkMedium(Color(4.5513, 5.8294, 7.136), Color(0.0015333, 0.0046, 0.019933), 1.3);
+//Medium milkMedium(Color(4.5513, 5.8294, 7.136), Color(0.0015333, 0.0046, 0.019933), 1.3);
 //Medium milkMedium(Color(0.45513, 0.58294, 0.7136), Color(0.00015333, 0.00046, 0.0019933), 1.3);
 //Medium milkMedium(Color(45.513, 58.294, 71.36), Color(0.015333, 0.046, 0.19933), 1.3);
-//Medium milkMedium(Color(100, 100, 100), Color(0.1, 0.1, 0.1), 1.3);
+Medium milkMedium(Color(10, 10, 10), Color(0.01, 0.01, 0.01), 1.3);
 
 //Medium milkMedium(Color(0.255, 0.321, 0.377), Color(0.00011, 0.00024, 0.0014), 1.3);
 

@@ -1,6 +1,5 @@
-//aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
-//#define bssrdf
+#define bssrdf
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <cmath>
 #include <cstdlib>
@@ -319,21 +318,8 @@ Color radiance(const Ray &ray, const Medium &medium, Random &rng, int depth, int
 	 double tr_select =0.0;
 	if (0.0 < scattering_probability) {
 		//平均自由工程
-		
-		 double tr_use = tr_average;
-		 
-		/* double u = rng.next01();
-		if (u <= double(1.0 / 3.0)) {
-			tr_use = sigT.x;
-		}
-		else if (u<=double(2.0/3.0)) {
-			 tr_use = sigT.y;
-		}
-		else if(u<=1.0){
 
-			 tr_use = sigT.z;
-		}*/
-		 tr_use = sigT.z;
+		 double tr_use = tr_average;
 		double w = rng.next01();
 		 double d = -log(1.0 - w) / tr_use;
 
@@ -571,48 +557,60 @@ Color radiance(const Ray &ray, const Medium &medium, Random &rng, int depth, int
 #ifdef bssrdf;
 			//p=exp(-1/sigma_t*x)の逆関数近似からの乱数
 			Vec sigmaT = obj.mat.medium.sigA + obj.mat.medium.sigS;
-				double pdf=1.0;
-				double u1 =0.75*rng.next01();
-				Vec rr_max=-(Vec(1.0)/ sigmaT)*Vec(log(0.25/Vec(sigmaT).x), log(0.25 / Vec(sigmaT).y), log(0.25 / Vec(sigmaT).z));//サンプリング半径の最大値(エネルギーの減衰が99.9パーセント)//ここは近似だからpdfに関係しない
-				Vec rr= -(Vec(1.0)/sigmaT)*log(1.0 - u1);
-				//RGBのサンプリング
-				double r_max;
-				double r;
-				u1 = rng.next01();
-				if (0.0 < u1<double(1.0 / 3.0)) {
-					r_max = rr_max.x; r = rr.x; pdf = pdf*(sigmaT.x*exp(-sigmaT.x*r))*(1.0/3.0);
-				}
-				else if (u1<double(2.0 / 3.0)) {
-					r_max = rr_max.y; r = rr.y; pdf = pdf*(sigmaT.y*exp(-sigmaT.y*r))*(1.0 / 3.0);
-				}
-				else {
-					r_max = rr_max.z; r = rr.z; pdf = pdf*(sigmaT.z*exp(-sigmaT.z*r))*(1.0 / 3.0);
-				}
+			double pdf = 1.0;
+			double bias = 0.99;
+			double u1 = bias*rng.next01();
+			Vec rr_max = -(Vec(1.0) / sigmaT)*log(1.0 - bias);//サンプリング半径の最大値(エネルギーの減衰がbias*100パーセント)//ここは近似だからpdfに関係しない
+			Vec rr	   = -(Vec(1.0) / sigmaT)*log(1.0 - u1);
+			//RGBのサンプリング
+			double r_max;
+			double r;
+			double tr_use;
+			u1 = rng.next01();
+			if (0.0 < u1<double(1.0 / 3.0)) {
+				r_max = rr_max.x; r = rr.x; tr_use = sigmaT.x;
+			}
+			else if (u1<double(2.0 / 3.0)) {
+				r_max = rr_max.y; r = rr.y; tr_use = sigmaT.y;
+			}
+			else {
+				r_max = rr_max.z; r = rr.z; tr_use = sigmaT.z;
+			}
 
-				if (r > r_max) {
-					return Color(0.0);
-				}
-				//r_maxより
-				double l = 2.0 * std::sqrt(r_max*r_max - r*r);
-
-				double phi = 2.0 * PI*rng.next01();
-				pdf = pdf*(1.0 / (2.0 * PI));
-				//正規直行基底
-				Vec w, u, v;
-				w = normal;
-				if (std::abs(w.x) > 0.1) {
-					u = Normalize(Cross(Vec(0.0, 1.0, 0.0), w));
-				}
-				else {
-					u = Normalize(Cross(Vec(1.0, 0.0, 0.0), w));
-				}
-				v = Cross(w, u);
-				Vec base_pos = hitpoint + r*(u*cos(phi) +v*sin(phi))+(l/2.0)*w;
-				Vec pTarget = base_pos - l*w;
+			if (r > r_max) {
+				return Color(0.0);
+			}
 			
-				//いくつかの交差点を保存するためにIntersectionのリストをもつ
-				std::vector<Intersection *> chains;
-				Vec temp=base_pos;
+
+			double l = 2.0 * std::sqrt(r_max*r_max - r*r);
+		
+			/*pdf = pdf / (2.0 * PI);*///ここでこれをかけると半径r周りのすべての点からの影響を考えることになるのでは？
+			//正規直行基底
+			Vec w, u, v;
+			w = Normalize(normal);
+			if (std::abs(w.x) > 0.1) {
+				u = Normalize(Cross(Vec(0.0, 1.0, 0.0), w));
+			}
+			else {
+				u = Normalize(Cross(Vec(1.0, 0.0, 0.0), w));
+			}
+
+			v = Cross(w, u);
+			//天頂方向のベクトルのランダムサンプリング
+
+			std::vector<Vec>axis{w,u,v};
+			//いくつかの交差点を保存するためにIntersectionのリストをもつ
+			std::vector<Intersection *> chains;
+
+			for (int j = 0; j < 1; j++) {
+				w = axis[(j) % 3];
+				u = axis[(j + 1) % 3];
+				v = axis[(j + 2) % 3];
+				u1 = rng.next01();
+				double phi = 2.0 * PI*u1;
+				Vec base_pos = hitpoint + r*(u*cos(phi) + v*sin(phi)) + (l / 2.0)*w;
+				Vec pTarget = base_pos - l*w;
+				Vec temp = base_pos;
 				//while (Vec(hitpoint - temp).Length() <= r_max) {
 				for (int i = 0; i < 1; i++) {
 					//pTarget~base_posまでのTRIANGLEを集める
@@ -621,8 +619,8 @@ Color radiance(const Ray &ray, const Medium &medium, Random &rng, int depth, int
 					bHitTri = Intersect(nodes, 0, Ray(temp, -w), &bintersection);
 					if (bHitTri != nullptr)
 					{
-						temp = bintersection.hitpoint.position -w*EPS;
-						if (Vec(hitpoint - temp).Length() <= r_max) {
+						temp = bintersection.hitpoint.position;
+						if (Vec(hitpoint - temp).Length() < r_max) {
 							chains.push_back(&bintersection);
 						}
 						else {
@@ -634,105 +632,106 @@ Color radiance(const Ray &ray, const Medium &medium, Random &rng, int depth, int
 					}
 				}
 
-
-				if (chains.size()==0) {
-					return Color(0.0);
-				}
-					
-			//	std::cout << obj.normal.toString() << std::endl;
-				
-				int r1 = (int)(rng.next01()*(chains.size()));
-				Intersection *sampledIntersect = chains[r1];//TODO	pdf
-				pdf = pdf*(1.0/(double)chains.size());
-				//基底ベクトルの変更
-				//return Vec(Dot(-ray.dir, sampledIntersect->hitpoint.normal));
-				Vec position_out = sampledIntersect->hitpoint.position;
-				Vec normal_out = sampledIntersect->hitpoint.normal;
-				w = normal_out;
-				//return Vec(Dot(w, -ray.dir)*Dot(w, -ray.dir));
-				if (std::abs(w.x) > 0.1) {
-					u = Normalize(Cross(Vec(0.0, 1.0, 0.0), w));
-				}
-				else {
-					u = Normalize(Cross(Vec(1.0, 0.0, 0.0), w));
-				}
-				v = Cross(w, u);
-				//return Vec(Dot(-ray.dir, w));
-				 u1 = rng.next01();
-				double u2 = rng.next01();
-				double theta = std::acos(1.0 - u1);
-			 phi = 2.0 * PI* u2;
-				Vec dir_out=Normalize(u*sin(theta)*cos(phi)+ v*sin(theta)*sin(phi)+ w*cos(theta));
-				//次の方向を半球状でランダムサンプリング(一様乱数)
-				pdf = pdf /(2.0 * PI);
-
-				if (pdf == 0.0000) {
-					return Color(0.0);
-				}
-				Ray reflection_ray_in = Ray(hitpoint, ray.dir - normal * 2.0 * Dot(normal, ray.dir));
-				// 反射方向からの直接光サンプリングする
-				Intersection llintersect;
-				TRIANGLE* lHitTri = nullptr;
-				lHitTri = Intersect(nodes, 0, reflection_ray_in, &llintersect);
-				Vec direct_light_in;
-				if (llintersect.obj_id == LightID) {
-					direct_light_in = Multiply(HitTri->mat.ref, triangles[LightID][0].mat.Le);
-				}
-				
-				Ray reflection_ray_out = Ray(position_out, dir_out);
-				// 反射方向からの直接光サンプリングする
-				 llintersect=Intersection();
-				lHitTri = nullptr;
-				lHitTri = Intersect(nodes, 0, reflection_ray_out, &llintersect);
-				Vec direct_light_out;
-				if (llintersect.obj_id == LightID) {
-					direct_light_out = Multiply(HitTri->mat.ref, triangles[LightID][0].mat.Le);
-				}
-				//return direct_light_out;
-				bool into = Dot(normal, orienting_normal) > 0.0; // レイがオブジェクトから出るのか、入るか
-				const double nc = 1.0; // 真空の屈折率
-				const double nt = 1.3; // オブジェクトの屈折率
-				double nnt = nc / nt;
-				const double ddn = Dot(ray.dir, orienting_normal);
-				/*u1 = (2.0*PI)*rng.next01();
-				pdf = pdf / (2.0*PI);*/
-				const double a = nt - nc, b = nt + nc;
-				const double R0 = (a * a) / (b * b);
-				double c = 1.0 +ddn;
-				const double Re_in = R0 + (1.0 - R0) * pow(c, 5.0);//反射光が運ぶ量
-				const double Tr_in = 1.0 - Re_in; // 屈折光の運ぶ光の量
-				const double probability_in = 0.25 + 0.5 * Re_in;
-
-
+			}
+			if (chains.size() == 0) {
+				return Color(0.0);
+			}
+		
+		
+			int r1 = (int)(rng.next01()*(chains.size()));
+			Intersection *sampledIntersect = chains[r1];
+			pdf *= (1.0 / (double)chains.size());
 			
-				nnt = 1 / nnt;
-				 c = 1.0 - ( Dot(reflection_ray_out.dir, normal));
-				const double Re_out = R0 + (1.0 - R0) * pow(c, 5.0);
-				const double Tr_out = 1.0 - Re_out; // 屈折光の運ぶ光の量
-				const double probability_out = 0.25 + 0.5 * Re_out;
+
+			//出射点が決まったのでpdfに距離の影響を考える
+			
+			//基底ベクトルの変更
+			Vec position_out = sampledIntersect->hitpoint.position;
+			if ((hitpoint-position_out).Length()>r_max) {
+				return Color(0.0);
+			}
+			pdf *= tr_use*exp(-tr_use*(hitpoint - position_out).Length());
+			Vec normal_out = sampledIntersect->hitpoint.normal;
+			w = normal_out;
+			if (std::abs(w.x) > 0.1) {
+				u = Normalize(Cross(Vec(0.0, 1.0, 0.0), w));
+			}
+			else {
+				u = Normalize(Cross(Vec(1.0, 0.0, 0.0), w));
+			}
+			v = Cross(w, u);
+			u1 = rng.next01();
+			double u2 = rng.next01();
+			double theta = std::acos(1.0 - u1);
+			double phi = 2.0 * PI* u2;
+			Vec dir_out = Normalize(u*sin(theta)*cos(phi) + v*sin(theta)*sin(phi) + w*cos(theta));
+			//次の方向を半球状でランダムサンプリング(一様乱数)
+			pdf = pdf / (2.0 * PI);
+
+			if (pdf == 0.0) {
+				return Color(0.0);
+			}
+			Ray reflection_ray_in = Ray(hitpoint, ray.dir - normal * 2.0 * Dot(normal, ray.dir));
+			// 反射方向からの直接光サンプリングする
+			Intersection llintersect;
+			TRIANGLE* lHitTri = nullptr;
+			lHitTri = Intersect(nodes, 0, reflection_ray_in, &llintersect);
+			Vec direct_light_in;
+			if (llintersect.obj_id == LightID) {
+				direct_light_in = Multiply(HitTri->mat.ref, triangles[LightID][0].mat.Le);
+			}
+
+			Ray reflection_ray_out = Ray(position_out, dir_out);
+			// 反射方向からの直接光サンプリングする
+			llintersect = Intersection();
+			lHitTri = nullptr;
+			lHitTri = Intersect(nodes, 0, reflection_ray_out, &llintersect);
+			Vec direct_light_out;
+			if (llintersect.obj_id == LightID) {
+				direct_light_out = Multiply(HitTri->mat.ref, triangles[LightID][0].mat.Le);
+			}
+			bool into = Dot(normal, orienting_normal) > 0.0; // レイがオブジェクトから出るのか、入るか
+			const double nc = 1.0; // 真空の屈折率
+			const double nt = 1.3; // オブジェクトの屈折率
+			double nnt = nc / nt;
+			const double ddn = Dot(ray.dir, orienting_normal);
+			const double a = nt - nc, b = nt + nc;
+			const double R0 = (a * a) / (b * b);
+			double c = 1.0 + ddn;
+			const double Re_in = R0 + (1.0 - R0) * pow(c, 5.0);//反射光が運ぶ量
+			const double Tr_in = 1.0 - Re_in; // 屈折光の運ぶ光の量
+			const double probability_in = 0.25 + 0.5 * Re_in;
 
 
-				double fm1 = Fdr(1.3); //FresnelMoment1(nnt);
-				double g = 0.0;
-				const Vec sigmaS_dush = obj.mat.medium.sigS * (1.0 - g);
-				const Vec sigmaT_dush = obj.mat.medium.sigA + sigmaS_dush;
-				const Vec albed_dush = sigmaS_dush / sigmaT_dush;
-				Vec sigma_tr = Vec::sqrt(3.0 * obj.mat.medium.sigA * sigmaT_dush);
-				double A = (1.0 + fm1) / (1.0 - fm1);
-				Vec zr = Vec(1.0) / sigmaT_dush;
-				Vec zv = -zr * (1.0 + (4.0 / 3.0) * A);
-				double r2 = r * r;
-				Vec dr = Vec::sqrt(Vec(r2) + zr * zr);
-				Vec dv = Vec::sqrt(Vec(r2) + zv * zv);
-				Vec phi_r = zr * (dr * sigma_tr + Vec(1.0)) * Vec::exp(-sigma_tr * dr) / (dr * dr * dr);
-				Vec phi_v = zv * (dv * sigma_tr + Vec(1.0)) * Vec::exp(-sigma_tr * dv) / (dv * dv * dv);
-				Vec Rd = (albed_dush / (4.0 * PI)) * (phi_r - phi_v);
-				Vec Sd =  Tr_out*(1.0 / PI)*Rd*Tr_in;
 
-				Vec light= direct_light_in + 
-					Multiply(Sd,Multiply(transmittance_ratio, direct_light_out +radiance(reflection_ray_out, medium, rng, depth + 1, maxDepth)))
-						/ (1.0 - scattering_probability) / russian_roulette_probability/(pdf);
-				return light;
+			nnt = 1 / nnt;
+			c = 1.0 - (Dot(reflection_ray_out.dir, normal));
+			const double Re_out = R0 + (1.0 - R0) * pow(c, 5.0);
+			const double Tr_out = 1.0 - Re_out; // 屈折光の運ぶ光の量
+			const double probability_out = 0.25 + 0.5 * Re_out;
+
+
+			double fm1 = Fdr(1.3); //FresnelMoment1(nnt);
+			double g = 0.0;
+			const Vec sigmaS_dush = obj.mat.medium.sigS * (1.0 - g);
+			const Vec sigmaT_dush = obj.mat.medium.sigA + sigmaS_dush;
+			const Vec albed_dush = sigmaS_dush / sigmaT_dush;
+			Vec sigma_tr = Vec::sqrt(3.0 * obj.mat.medium.sigA * sigmaT_dush);
+			double A = (1.0 + fm1) / (1.0 - fm1);
+			Vec zr = Vec(1.0) / sigmaT_dush;
+			Vec zv = -zr * (1.0 + (4.0 / 3.0) * A);
+			double r2 = r * r;
+			Vec dr = Vec::sqrt(Vec(r2) + zr * zr);
+			Vec dv = Vec::sqrt(Vec(r2) + zv * zv);
+			Vec phi_r = zr * (dr * sigma_tr + Vec(1.0)) * Vec::exp(-sigma_tr * dr) / (dr * dr * dr);
+			Vec phi_v = zv * (dv * sigma_tr + Vec(1.0)) * Vec::exp(-sigma_tr * dv) / (dv * dv * dv);
+			Vec Rd = (albed_dush / (4.0 * PI)) * (phi_r - phi_v);
+			Vec Sd = Tr_out*(1.0 / PI)*Rd*Tr_in;
+
+			Vec light = direct_light_in +
+				Multiply(Sd, direct_light_out + radiance(reflection_ray_out, medium, rng, depth + 1, maxDepth))
+				/ russian_roulette_probability / (pdf);
+			return light;
 #endif 
 #ifndef bssrdf
 			Ray reflection_ray = Ray(hitpoint, ray.dir - normal * 2.0 * Dot(normal, ray.dir));
@@ -1021,7 +1020,7 @@ int main(int argc, char **argv) {
 		// コマンド引数のパース
 		int width = 320;
 		int height = 240;
-		int samples = 100;//100;
+		int samples = 1000;//100;
 		int maxDepth =100;//25;
 		for (int i = 1; i < argc; i++) {
 			if (strcmp(argv[i], "--width") == 0) {

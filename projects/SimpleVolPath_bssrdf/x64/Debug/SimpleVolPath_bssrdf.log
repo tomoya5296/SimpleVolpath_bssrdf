@@ -3,15 +3,17 @@ c:\users\tomoya\documents\github\simplevolpath_bssrdf\src\bvh.h(22): warning C43
 c:\users\tomoya\documents\github\simplevolpath_bssrdf\src\bvh.h(23): warning C4305: '=': 'const double' から 'float' へ切り詰めます。
 c:\users\tomoya\documents\github\simplevolpath_bssrdf\src\bvh.h(84): warning C4244: '引数': 'const double' から 'const float' への変換です。データが失われる可能性があります。
 c:\users\tomoya\documents\github\simplevolpath_bssrdf\src\bvh.h(100): warning C4267: '初期化中': 'size_t' から 'int' に変換しました。データが失われているかもしれません。
-c:\users\tomoya\documents\github\simplevolpath_bssrdf\src\main.cpp(248): warning C4244: 'return': 'double' から 'float' への変換です。データが失われる可能性があります。
-c:\users\tomoya\documents\github\simplevolpath_bssrdf\src\main.cpp(271): warning C4244: 'return': 'double' から 'float' への変換です。データが失われる可能性があります。
-c:\users\tomoya\documents\github\simplevolpath_bssrdf\src\main.cpp(570): warning C4067: プリプロセッサ ディレクティブの後に余分な文字がありました - 改行が必要です
-c:\users\tomoya\documents\github\simplevolpath_bssrdf\src\main.cpp(894): warning C4267: '初期化中': 'size_t' から 'int' に変換しました。データが失われているかもしれません。
-c:\users\tomoya\documents\github\simplevolpath_bssrdf\src\main.cpp(943): warning C4244: '=': 'const double' から 'float' への変換です。データが失われる可能性があります。
-c:\users\tomoya\documents\github\simplevolpath_bssrdf\src\main.cpp(944): warning C4244: '=': 'const double' から 'float' への変換です。データが失われる可能性があります。
+c:\users\tomoya\documents\github\simplevolpath_bssrdf\src\main.cpp(247): warning C4244: 'return': 'double' から 'float' への変換です。データが失われる可能性があります。
+c:\users\tomoya\documents\github\simplevolpath_bssrdf\src\main.cpp(270): warning C4244: 'return': 'double' から 'float' への変換です。データが失われる可能性があります。
+c:\users\tomoya\documents\github\simplevolpath_bssrdf\src\main.cpp(557): warning C4067: プリプロセッサ ディレクティブの後に余分な文字がありました - 改行が必要です
+c:\users\tomoya\documents\github\simplevolpath_bssrdf\src\main.cpp(570): warning C4804: '<': 演算中の 'bool' 型の使用方法が安全ではありません
+c:\users\tomoya\documents\github\simplevolpath_bssrdf\src\main.cpp(716): warning C4305: '引数': 'double' から 'float' へ切り詰めます。
+c:\users\tomoya\documents\github\simplevolpath_bssrdf\src\main.cpp(896): warning C4267: '初期化中': 'size_t' から 'int' に変換しました。データが失われているかもしれません。
 c:\users\tomoya\documents\github\simplevolpath_bssrdf\src\main.cpp(945): warning C4244: '=': 'const double' から 'float' への変換です。データが失われる可能性があります。
 c:\users\tomoya\documents\github\simplevolpath_bssrdf\src\main.cpp(946): warning C4244: '=': 'const double' から 'float' への変換です。データが失われる可能性があります。
 c:\users\tomoya\documents\github\simplevolpath_bssrdf\src\main.cpp(947): warning C4244: '=': 'const double' から 'float' への変換です。データが失われる可能性があります。
 c:\users\tomoya\documents\github\simplevolpath_bssrdf\src\main.cpp(948): warning C4244: '=': 'const double' から 'float' への変換です。データが失われる可能性があります。
+c:\users\tomoya\documents\github\simplevolpath_bssrdf\src\main.cpp(949): warning C4244: '=': 'const double' から 'float' への変換です。データが失われる可能性があります。
+c:\users\tomoya\documents\github\simplevolpath_bssrdf\src\main.cpp(950): warning C4244: '=': 'const double' から 'float' への変換です。データが失われる可能性があります。
   SimpleVolPath_bssrdf.vcxproj -> C:\Users\tomoya\Documents\GitHub\SimpleVolPath_bssrdf\x64\Debug\SimpleVolPath_bssrdf.exe
   SimpleVolPath_bssrdf.vcxproj -> C:\Users\tomoya\Documents\GitHub\SimpleVolPath_bssrdf\x64\Debug\SimpleVolPath_bssrdf.pdb (Partial PDB)
